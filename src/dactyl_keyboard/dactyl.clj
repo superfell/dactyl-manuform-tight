@@ -87,9 +87,6 @@
 (def wall-xy-offset 1)
 (def wall-thickness 1)  ; wall thickness parameter
 
-(def thumb-pos [5.5 1 9] )
-(def thumb-rot [0 10 0] )
-
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;; General variables ;;
 ;;;;;;;;;;;;;;;;;;;;;;;
@@ -105,6 +102,9 @@
 (def keyswitch-height 13.8)
 (def keyswitch-width 13.9)
 (def plate-thickness 5)
+
+(def thumb-pos [(* -1.2 keyswitch-width) 1 0] )
+(def thumb-rot [0 10 0] )
 
 (def retention-tab-thickness 1.5)
 (def retention-tab-hole-thickness (- plate-thickness retention-tab-thickness))
