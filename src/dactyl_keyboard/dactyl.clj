@@ -59,7 +59,7 @@
               (>= column 5) 1.8 ;;pinky outer
               :else 0 ))
 
-(def tenting-angle (deg2rad 35)) ; controls left-right tilt / tenting (higher number is more tenting) 
+(def tenting-angle (deg2rad 18)) ; controls left-right tilt / tenting (higher number is more tenting) 
 (def centercol 3)                ; or, change this for more destructive tenting control
 
 (defn column-offset [column] (cond
@@ -103,8 +103,8 @@
 (def keyswitch-width 13.9)
 (def plate-thickness 5)
 
-(def thumb-pos [(* -1.2 keyswitch-width) 1 0] )
-(def thumb-rot [0 10 0] )
+(def thumb-pos [(* -1.2 keyswitch-width) -2 0] )
+(def thumb-rot [0 0 0] )
 
 (def retention-tab-thickness 1.5)
 (def retention-tab-hole-thickness (- plate-thickness retention-tab-thickness))
@@ -790,7 +790,7 @@ need to adjust for difference for thumb-z only"
                                        (- thumb-design-z plate-thickness) 
                                        0)) 
                             1.1))
-(def thumb-x-rotation-adjustment -12) ; globally adjust front/back tilt of thumb keys
+(def thumb-x-rotation-adjustment 12) ; globally adjust front/back tilt of thumb keys
 (defn thumb-place [rot move shape]
   (->> 
     (->> shape
@@ -808,9 +808,9 @@ need to adjust for difference for thumb-z only"
      (rotate (deg2rad (nth thumb-rot 2)) [0 0 1])))
 
 ; convexer
-(defn thumb-r-place [shape] (thumb-place [14 -35 10] [-14.5 -10 5] shape)) ; right
-(defn thumb-m-place [shape] (thumb-place [10 -23 20] [-33 -15.2 -6] shape)) ; middle
-(defn thumb-l-place [shape] (thumb-place [6 -5 25] [-53 -23.5 -11.5] shape)) ; left
+(defn thumb-r-place [shape] (thumb-place [14 -40 10] [-15 -10 5] shape)) ; right
+(defn thumb-m-place [shape] (thumb-place [10 -23 20] [-33 -15 -6] shape)) ; middle
+(defn thumb-l-place [shape] (thumb-place [6 -5 35] [-52.5 -25.5 -13.5] shape)) ; left
 
 (defn thumb-layout [shape]
   (union
@@ -887,41 +887,33 @@ need to adjust for difference for thumb-z only"
                (thumb-m-place web-post-bl))
            ) (color ORA))
 
-    (hull                                                   ; between thumb m and top key
-      (key-place 0 cornerrow (translate (wall-locate1 -1 0) web-post-bl))
-      (thumb-m-place web-post-tr)
-      (thumb-m-place web-post-tl))
-    (piramid-hulls                                          ; top ridge thumb side
-      (key-place 0 cornerrow (translate (wall-locate1 -1 0) fat-web-post-bl))
-      (key-place 0 cornerrow (translate (wall-locate2 -1 0) web-post-bl))
-      (key-place 0 cornerrow web-post-bl)
-      ;(thumb-r-place web-post-tr)
-      (thumb-r-place web-post-tl)
-      (thumb-m-place web-post-tr)
-      (key-place 0 cornerrow (translate (wall-locate2 -1 0) web-post-bl))
-      )
+;;     (->> (hull
+;;       (key-place 0 cornerrow fat-web-post-br)
+;;       (key-place 0 cornerrow fat-web-post-bl)
+;;  ;     (thumb-r-place web-post-tl)
+;; ;      (thumb-r-place fat-web-post-tr)
+;;       (key-place 1 cornerrow web-post-bl)
+;;       (key-place 1 cornerrow web-post-br)) (color BLU))
+
     (->> (triangle-hulls
-      (key-place 0 cornerrow fat-web-post-br)
-      (key-place 0 cornerrow fat-web-post-bl)
-      (thumb-r-place web-post-tl)
+       (thumb-r-place fat-web-post-tl)
+       (key-place 0 cornerrow web-post-bl)
+       (thumb-r-place fat-web-post-tr)
+       (key-place 0 cornerrow web-post-br)
+    ) (color GRE))
+
+    (->> (triangle-hulls
       (key-place 1 cornerrow web-post-bl)
-      (key-place 1 cornerrow web-post-br)) (color BLU))
-    (->> (triangle-hulls
-      (thumb-r-place fat-web-post-tl)
-      (thumb-r-place fat-web-post-tr)
+      (thumb-r-place plate-post-tr)
       (key-place 1 cornerrow web-post-br)
-      ; (key-place 2 lastrow web-post-tl)
-      ) (color NBL))
-    (->> (triangle-hulls
-      (key-place 2 lastrow web-post-tl)
-      ; (thumb-r-place fat-web-post-tr)
-      ; (key-place 2 lastrow web-post-bl)
-      (thumb-r-place fat-web-post-br)) (color PUR))
+      (thumb-r-place plate-post-br)
+      (key-place 2 lastrow web-post-bl) ) (color PUR))
+
     (->> (triangle-hulls
       (thumb-r-place web-post-br)
       (key-place 2 lastrow web-post-bl)
       (key-place 3 lastrow web-post-bl)
-      (key-place 2 lastrow web-post-br)) (color PIN))
+      (key-place 2 lastrow web-post-br)) (color ORA))
     ))
 
 ; dx1, dy1, dx2, dy2 = direction of the wall. '1' for front, '-1' for back, '0' for 'not in this direction'.
@@ -981,6 +973,24 @@ need to adjust for difference for thumb-z only"
       ; (place2 (translate (wall-locate2 dx2 dy2) post2))
       )
      (color ORA))
+  ))
+
+(defn wall-brace-thumb-back [place1 dx1 dy1 post1
+                             place2 dx2 dy2 post2]
+  "Wall brace for the back of the thumb cluster where its angled the other way to everywhere else.
+  Assuming you have the thumb keys angled towards the user."
+  (union
+    (->> (hull
+      (place1 post1)
+      (place1 (translate (wall-locate1 dx1 dy1) post1))
+      (place2 post2)
+      (place2 (translate (wall-locate1 dx2 dy2) post2))
+      )
+    (color BRO))
+    (->> (bottom-hull
+          (place1 post1)
+          (place2 post2))
+        (color ORA))
   ))
 
 (defn wall-brace-deeper [place1 dx1 dy1 post1 
@@ -1125,10 +1135,6 @@ need to adjust for difference for thumb-z only"
 
     (for [y (range 2 lastrow)] (key-wall-brace      0 y  -1 0 web-post-tl 0 y -1 0 web-post-bl))
     (for [y (range 2 lastrow)] (key-wall-brace 0 (dec y) -1 0 web-post-bl 0 y -1 0 web-post-tl))
-
-    ; thumb connector
-    (->> (wall-brace (partial key-place 0 cornerrow) -1 0 web-post-bl thumb-m-place 0 1 fat-web-post-tl) 
-         (color WHI))
   )
 )
 
@@ -1138,6 +1144,8 @@ need to adjust for difference for thumb-z only"
     (key-wall-brace 3 lastrow 0.5 -1 fat-web-post-br 4 cornerrow 0.5 -1 fat-web-post-bl)
     (for [x (range 4 ncols)] (key-wall-brace x cornerrow 0 -1 fat-web-post-bl      x  cornerrow 0 -1 fat-web-post-br)) ; TODO fix extra wall
     (for [x (range 5 ncols)] (key-wall-brace x cornerrow 0 -1 fat-web-post-bl (dec x) cornerrow 0 -1 fat-web-post-br))
+
+    ; thumb connector
     (->> (wall-brace thumb-r-place 0 -1 fat-web-post-br (partial key-place 3 lastrow) 0 -1 web-post-bl) 
          (color RED))
   )
@@ -1146,24 +1154,18 @@ need to adjust for difference for thumb-z only"
 (def thumb-wall
   (union 
     ; thumb walls
-    (->> (wall-brace thumb-r-place  0 -1 fat-web-post-br thumb-r-place  0 -1 fat-web-post-bl) (color ORA))
-    (->> (wall-brace-deeper thumb-m-place  0 -1 fat-web-post-br thumb-m-place  0 -1 fat-web-post-bl) (color YEL))
-    (->> (wall-brace        thumb-m-place  0 -1 fat-web-post-br thumb-m-place  0 -1 fat-web-post-bl) (color YEL))
-    (->> (wall-brace-deeper thumb-l-place  0 -1 fat-web-post-br thumb-l-place  0 -1 fat-web-post-bl) (color GRE))
-    (->> (wall-brace        thumb-l-place  0 -1 fat-web-post-br thumb-l-place  0 -1 fat-web-post-bl) (color GRE))
-    (->> (wall-brace-deeper thumb-l-place  0  1 fat-web-post-tr thumb-l-place  0  1 fat-web-post-tl) (color CYA))
+    (->> (wall-brace-thumb-back thumb-r-place  0 -1 fat-web-post-br thumb-r-place 0 -1 fat-web-post-bl) (color ORA))
+    (->> (wall-brace-thumb-back thumb-m-place  0 -1 fat-web-post-br thumb-m-place 0 -1 fat-web-post-bl) (color YEL))
+    (->> (wall-brace-thumb-back thumb-l-place  0 -1 fat-web-post-br thumb-l-place 0 -1 fat-web-post-bl) (color GRE))
     (->> (wall-brace        thumb-l-place  0  1 fat-web-post-tr thumb-l-place  0  1 fat-web-post-tl) (color CYA))
-    (->> (wall-brace-deeper thumb-l-place -1  0 fat-web-post-tl thumb-l-place -1  0 fat-web-post-bl) (color BLU))
-    ; thumb corners
-    (->> (wall-brace-deeper thumb-l-place -1  0 fat-web-post-bl thumb-l-place  0 -1 fat-web-post-bl) (color NBL))
-    (->> (wall-brace-deeper thumb-l-place -1  0 fat-web-post-tl thumb-l-place  0  1 fat-web-post-tl) (color PUR))
-    ; thumb tweeners
-    (->> (wall-brace-deeper thumb-r-place  0 -1 fat-web-post-bl thumb-m-place  0 -1 fat-web-post-br) (color PIN))
-    (->> (wall-brace        thumb-r-place  0 -1 fat-web-post-bl thumb-m-place  0 -1 fat-web-post-br) (color PIN))
-    (->> (wall-brace-deeper thumb-m-place  0 -1 fat-web-post-bl thumb-l-place  0 -1 fat-web-post-br) (color MAG))
-    (->> (wall-brace        thumb-m-place  0 -1 fat-web-post-bl thumb-l-place  0 -1 fat-web-post-br) (color MAG))
-    (->> (wall-brace-back   thumb-m-place  0  1 fat-web-post-tl thumb-l-place  0  1 fat-web-post-tr) (color BRO))
-    (->> (wall-brace        thumb-l-place -1  0 fat-web-post-bl thumb-l-place -1  0 fat-web-post-tl) (color BLA))
+    (->> (wall-brace        thumb-m-place  0  1 fat-web-post-tr thumb-m-place  0  1 fat-web-post-tl) (color BLU))
+    ;; ; thumb tweeners
+     (->> (wall-brace-thumb-back thumb-r-place  0 -1 fat-web-post-bl thumb-m-place  0 -1 fat-web-post-br) (color PIN))
+     (->> (wall-brace-thumb-back thumb-m-place  0 -1 fat-web-post-bl thumb-l-place  0 -1 fat-web-post-br) (color MAG))
+    ; ?
+     (->> (wall-brace   thumb-r-place  0  1 fat-web-post-tl thumb-m-place  0  1 fat-web-post-tr) (color CYA))
+     (->> (wall-brace   thumb-m-place  0  1 fat-web-post-tl thumb-l-place  0  1 fat-web-post-tr) (color BRO))
+     (->> (wall-brace   thumb-l-place -1  0 fat-web-post-bl thumb-l-place -1  0 fat-web-post-tl) (color BLA))
   )
 )
 
@@ -1440,25 +1442,36 @@ need to adjust for difference for thumb-z only"
 
 (spit "things/test.scad"
       (write-scad
-        ; (difference
-          (union
-            ; (->>  
-              (model-right false)
-              ; (color BLU)
-            ; )
-            caps
-            ; (debug caps-cutout)
-            thumbcaps
-            ; (debug thumbcaps-cutout)
-            ; (debug key-space-below)
-            ; (debug thumb-space-below)
-            ; (if use_hotswap(debug (thumb-space-hotswap false)))
-
-            (debug usb-holder)
-            (translate [0 0 (- (/ bottom-plate-thickness 2))]
-                (debug bottom-plate)
-                (translate [8 -100 (- (/ bottom-plate-thickness 2))] wrist-rest-right-holes)
+          (difference
+              (union
+                ;(key-holes mirror-internals)
+                ;(if use_flex_pcb_holder flex-pcb-holders)
+                ;connectors
+                (thumb false)
+                thumb-connectors
+                case-walls
+                ;(difference (union case-walls
+                ;                  screw-insert-outers
+                ;                  )
+                ;            usb-holder-space
+                ;            screw-insert-holes
+                ;            )
+              )
+              
+       ;       (if recess-bottom-plate
+     ;;             (union
+    ;                  (translate [0 0 (- (+ 20 bottom-plate-thickness))] (cube 350 350 40))
+   ;                   (translate [0 0 (- (/ bottom-plate-thickness 2))] bottom-plate)
+  ;                )
+ ;                 (translate [0 0 -20] (cube 350 350 40))
+;              )
+              
+              ;caps-cutout
+  ;            thumbcaps-cutout
+              thumb-key-cutout
+              ;(if (not (or use_hotswap use_solderless)) 
+              ;    (union key-space-below
+              ;          thumb-space-below))
+              (if use_hotswap (thumb-space-hotswap false))
             )
-          )
-        ; )
       ))
