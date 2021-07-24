@@ -1193,10 +1193,10 @@ need to adjust for difference for thumb-z only"
 
 (def screw-insert-bottom-offset 0)
 (defn screw-insert-all-shapes [bottom-radius top-radius height]
-  (union (->> (screw-insert 2             0 bottom-radius top-radius height [  1    5 screw-insert-bottom-offset]) (color RED))    ; top middle
-         (->> (screw-insert 0             1 bottom-radius top-radius height [ -6  -13   screw-insert-bottom-offset]) (color PIN))    ; left
-         (->> (screw-insert 0       lastrow bottom-radius top-radius height [-52  -11   screw-insert-bottom-offset]) (color BRO))    ;thumb
-         (->> (screw-insert (- lastcol 1) 0 bottom-radius top-radius height [ 15    1.5 screw-insert-bottom-offset]) (color PUR))    ; top right
+  (union (->> (screw-insert 2             0 bottom-radius top-radius height [  6    5 screw-insert-bottom-offset]) (color RED))    ; top middle
+         (->> (screw-insert 0             1 bottom-radius top-radius height [ -7  -13   screw-insert-bottom-offset]) (color PIN))    ; left
+         (->> (screw-insert 0       lastrow bottom-radius top-radius height [-52  -12   screw-insert-bottom-offset]) (color BRO))    ;thumb
+         (->> (screw-insert (- lastcol 1) 0 bottom-radius top-radius height [ 19    1.5 screw-insert-bottom-offset]) (color PUR))    ; top right
          (->> (screw-insert 2 (+ lastrow 1) bottom-radius top-radius height [ 17.5  9.5 screw-insert-bottom-offset]) (color BLA)) )) ;bottom middle
 
 ; Hole Depth Y: 4.4
