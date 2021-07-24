@@ -37,7 +37,7 @@
 (def use_hotswap true)         ; kailh hotswap holder
 (def use_solderless false)       ; solderless switch plate
 
-(def recess-bottom-plate true)
+(def recess-bottom-plate false)
 (def adjustable-wrist-rest-holder-plate true)
 (def north_facing true)
 
@@ -55,8 +55,8 @@
               (= column 1)  2.0 ;;index
               (= column 2)  2.1 ;;middle
               (= column 3)  2.1 ;;ring
-              (= column 4)  1.8 ;;pinky outer
-              (>= column 5) 1.8 ;;pinky outer
+              (= column 4)  2.1 ;;pinky outer
+              (>= column 5) 2.0 ;;pinky outer
               :else 0 ))
 
 (def tenting-angle (deg2rad 18)) ; controls left-right tilt / tenting (higher number is more tenting) 
@@ -71,7 +71,7 @@
                   (>= column 5) [0 -14  6  ] ;;pinky outer
                   :else [0 0 0]))
 
-(def keyboard-z-offset 22.5)  ; controls overall height
+(def keyboard-z-offset 12.5)  ; controls overall height
 
 (def  extra-width 2)          ; extra horizontal space between the base of keys
 (defn extra-height [column]   ; extra vertical space between the base of keys
@@ -117,7 +117,7 @@
 (def swap-z              3)
 (def web-thickness (if use_hotswap (+ plate-thickness swap-z) plate-thickness))
 (def keyswitch-below-plate (- 8 web-thickness)) ; approx space needed below keyswitch, ameoba is 6mm
-(def square-led-size     6)
+(def square-led-size     0)
 
 (def switch-teeth-cutout
   (let [
@@ -896,14 +896,14 @@ need to adjust for difference for thumb-z only"
 ;;       (key-place 1 cornerrow web-post-br)) (color BLU))
 
     (->> (triangle-hulls
-       (thumb-r-place fat-web-post-tl)
+       (thumb-r-place web-post-tl)
        (key-place 0 cornerrow web-post-bl)
-       (thumb-r-place fat-web-post-tr)
+       (thumb-r-place web-post-tr)
        (key-place 0 cornerrow web-post-br)
     ) (color GRE))
 
     (->> (triangle-hulls
-      (key-place 1 cornerrow web-post-bl)
+      (key-place 0 cornerrow web-post-br)
       (thumb-r-place plate-post-tr)
       (key-place 1 cornerrow web-post-br)
       (thumb-r-place plate-post-br)
@@ -1195,7 +1195,7 @@ need to adjust for difference for thumb-z only"
 (defn screw-insert-all-shapes [bottom-radius top-radius height]
   (union (->> (screw-insert 2             0 bottom-radius top-radius height [  1    5 screw-insert-bottom-offset]) (color RED))    ; top middle
          (->> (screw-insert 0             1 bottom-radius top-radius height [ -6  -13   screw-insert-bottom-offset]) (color PIN))    ; left
-         (->> (screw-insert 0       lastrow bottom-radius top-radius height [-24  -15   screw-insert-bottom-offset]) (color BRO))    ;thumb
+         (->> (screw-insert 0       lastrow bottom-radius top-radius height [-52  -11   screw-insert-bottom-offset]) (color BRO))    ;thumb
          (->> (screw-insert (- lastcol 1) 0 bottom-radius top-radius height [ 15    1.5 screw-insert-bottom-offset]) (color PUR))    ; top right
          (->> (screw-insert 2 (+ lastrow 1) bottom-radius top-radius height [ 17.5  9.5 screw-insert-bottom-offset]) (color BLA)) )) ;bottom middle
 
@@ -1443,35 +1443,34 @@ need to adjust for difference for thumb-z only"
 (spit "things/test.scad"
       (write-scad
           (difference
-              (union
-                ;(key-holes mirror-internals)
-                ;(if use_flex_pcb_holder flex-pcb-holders)
-                ;connectors
-                (thumb false)
-                thumb-connectors
-                case-walls
-                ;(difference (union case-walls
-                ;                  screw-insert-outers
-                ;                  )
-                ;            usb-holder-space
-                ;            screw-insert-holes
-                ;            )
-              )
-              
-       ;       (if recess-bottom-plate
-     ;;             (union
-    ;                  (translate [0 0 (- (+ 20 bottom-plate-thickness))] (cube 350 350 40))
-   ;                   (translate [0 0 (- (/ bottom-plate-thickness 2))] bottom-plate)
-  ;                )
- ;                 (translate [0 0 -20] (cube 350 350 40))
-;              )
-              
-              ;caps-cutout
-  ;            thumbcaps-cutout
-              thumb-key-cutout
-              ;(if (not (or use_hotswap use_solderless)) 
-              ;    (union key-space-below
-              ;          thumb-space-below))
-              (if use_hotswap (thumb-space-hotswap false))
+            (union
+;;              (key-holes mirror-internals)
+  ;;            (if use_flex_pcb_holder flex-pcb-holders)
+              connectors
+              (thumb false)
+              thumb-connectors
+              (difference (union case-walls
+                                screw-insert-outers
+                                )
+                          usb-holder-space
+                          screw-insert-holes
+                          )
             )
-      ))
+            
+            (if recess-bottom-plate
+                (union
+                    (translate [0 0 (- (+ 20 bottom-plate-thickness))] (cube 350 350 40))
+                    (translate [0 0 (- (/ bottom-plate-thickness 2))] bottom-plate)
+                )
+                (translate [0 0 -20] (cube 350 350 40))
+            )
+            
+            ;; caps-cutout
+            ;; thumbcaps-cutout
+            ;; thumb-key-cutout
+            (if (not (or use_hotswap use_solderless)) 
+                (union key-space-below
+                      thumb-space-below))
+            (if use_hotswap (thumb-space-hotswap false))
+          )
+))
