@@ -909,11 +909,11 @@ need to adjust for difference for thumb-z only"
       (thumb-r-place plate-post-br)
       (key-place 2 lastrow web-post-bl) ) (color PUR))
 
-    (->> (triangle-hulls
-      (thumb-r-place web-post-br)
-      (key-place 2 lastrow web-post-bl)
-      (key-place 3 lastrow web-post-bl)
-      (key-place 2 lastrow web-post-br)) (color ORA))
+    ;; (->> (triangle-hulls
+    ;;   (thumb-r-place web-post-br)
+    ;;   (key-place 2 lastrow web-post-bl)
+    ;;   (key-place 3 lastrow web-post-bl)
+    ;;   (key-place 2 lastrow web-post-br)) (color WHI))
     ))
 
 ; dx1, dy1, dx2, dy2 = direction of the wall. '1' for front, '-1' for back, '0' for 'not in this direction'.
@@ -1140,14 +1140,19 @@ need to adjust for difference for thumb-z only"
 
 (def front-wall
   (union 
+    (key-wall-brace 2 lastrow 0   -1 web-post-bl     2   lastrow 0.5 -1 web-post-br)
+    (key-wall-brace 2 lastrow 0.5 -1 fat-web-post-br 3   lastrow 0.5 -1 fat-web-post-bl)
     (key-wall-brace 3 lastrow 0   -1 web-post-bl     3   lastrow 0.5 -1 web-post-br)
     (key-wall-brace 3 lastrow 0.5 -1 fat-web-post-br 4 cornerrow 0.5 -1 fat-web-post-bl)
     (for [x (range 4 ncols)] (key-wall-brace x cornerrow 0 -1 fat-web-post-bl      x  cornerrow 0 -1 fat-web-post-br)) ; TODO fix extra wall
     (for [x (range 5 ncols)] (key-wall-brace x cornerrow 0 -1 fat-web-post-bl (dec x) cornerrow 0 -1 fat-web-post-br))
 
-    ; thumb connector
-    (->> (wall-brace thumb-r-place 0 -1 fat-web-post-br (partial key-place 3 lastrow) 0 -1 web-post-bl) 
-         (color RED))
+    ;thumb connector
+    (->> (wall-brace thumb-r-place 0 -1 fat-web-post-br (partial key-place 2 lastrow) 0 -1 web-post-bl) 
+          (color YEL))
+
+    (->> (bottom-hull (translate[0 -4 -20] (key-place 2 lastrow fat-web-post-bl))  (thumb-r-place fat-web-post-br))
+          (color RED))
   )
 )
 
@@ -1456,9 +1461,9 @@ need to adjust for difference for thumb-z only"
             (union
 ;;              (key-holes mirror-internals)
   ;;            (if use_flex_pcb_holder flex-pcb-holders)
-              ;; connectors
-              ;; (thumb false)
-              ;; thumb-connectors
+              connectors
+              (thumb false)
+               thumb-connectors
               (difference ( union case-walls
                                  screw-insert-outers
                            )
