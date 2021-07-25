@@ -1222,11 +1222,21 @@ need to adjust for difference for thumb-z only"
 (def usb-holder-clearance 0.05)
 (def usb-holder-bottom-offset 0.05)
 
+(def usb-holder-slot-width 1.45)
+(def usb-holder-slow-depth 1.5)
+(def usb-holder-template
+  (difference
+    (cube 35 20 usb-holder-cutout-height)
+    (translate [(-  17.5 (/ usb-holder-slot-width 2)) 0 0] (color BLU (cube usb-holder-slot-width usb-holder-slow-depth  usb-holder-cutout-height) ))
+    (translate [(+ -17.5 (/ usb-holder-slot-width 2)) 0 0] (color BLU (cube usb-holder-slot-width usb-holder-slow-depth  usb-holder-cutout-height) ))
+  )
+)
+
 (def usb-holder-offset-coordinates 
   (if use_hotswap
-    [-31.2 56.5 usb-holder-bottom-offset]
+    [-39.2 55.5 usb-holder-bottom-offset]
     [-29.9 54.5 usb-holder-bottom-offset]))
-(def usb-holder (translate usb-holder-offset-coordinates usb-holder))
+(def usb-holder (translate usb-holder-offset-coordinates usb-holder-template))
 (def usb-holder-space
   (translate [0 0 (/ usb-holder-bottom-offset 2)]
   (extrude-linear {:height usb-holder-cutout-height :twist 0 :convexity 0}
@@ -1446,12 +1456,12 @@ need to adjust for difference for thumb-z only"
             (union
 ;;              (key-holes mirror-internals)
   ;;            (if use_flex_pcb_holder flex-pcb-holders)
-              connectors
-              (thumb false)
-              thumb-connectors
-              (difference (union case-walls
-                                screw-insert-outers
-                                )
+              ;; connectors
+              ;; (thumb false)
+              ;; thumb-connectors
+              (difference ( union case-walls
+                                 screw-insert-outers
+                           )
                           usb-holder-space
                           screw-insert-holes
                           )
