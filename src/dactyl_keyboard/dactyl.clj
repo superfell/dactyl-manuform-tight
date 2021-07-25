@@ -1222,24 +1222,25 @@ need to adjust for difference for thumb-z only"
                            screw-insert-height
                          ))
 
-(def usb-holder (import "../things/usb_holder_w_reset.stl"))
+; The actual cutout is half this, the other half gets trimmed away when the bottom is sliced 
 (def usb-holder-cutout-height 30.3)
 (def usb-holder-clearance 0.05)
 (def usb-holder-bottom-offset 0.05)
 
+(def usb-holder-width 30.7)
 (def usb-holder-slot-width 1.45)
 (def usb-holder-slow-depth 1.5)
 (def usb-holder-template
   (difference
-    (cube 35 20 usb-holder-cutout-height)
-    (translate [(-  17.5 (/ usb-holder-slot-width 2)) 0 0] (color BLU (cube usb-holder-slot-width usb-holder-slow-depth  usb-holder-cutout-height) ))
-    (translate [(+ -17.5 (/ usb-holder-slot-width 2)) 0 0] (color BLU (cube usb-holder-slot-width usb-holder-slow-depth  usb-holder-cutout-height) ))
+    (cube usb-holder-width 20 usb-holder-cutout-height)
+    (translate [(- (/ usb-holder-width  2) (/ usb-holder-slot-width 2)) 0 0] (color BLU (cube usb-holder-slot-width usb-holder-slow-depth  usb-holder-cutout-height) ))
+    (translate [(+ (/ usb-holder-width -2) (/ usb-holder-slot-width 2)) 0 0] (color BLU (cube usb-holder-slot-width usb-holder-slow-depth  usb-holder-cutout-height) ))
   )
 )
 
 (def usb-holder-offset-coordinates 
   (if use_hotswap
-    [-39.2 55.5 usb-holder-bottom-offset]
+    [-39.2 54.2 usb-holder-bottom-offset]
     [-29.9 54.5 usb-holder-bottom-offset]))
 (def usb-holder (translate usb-holder-offset-coordinates usb-holder-template))
 (def usb-holder-space
@@ -1461,9 +1462,9 @@ need to adjust for difference for thumb-z only"
             (union
 ;;              (key-holes mirror-internals)
   ;;            (if use_flex_pcb_holder flex-pcb-holders)
-              connectors
-              (thumb false)
-               thumb-connectors
+    ;;          connectors
+  ;;            (thumb false)
+;;               thumb-connectors
               (difference ( union case-walls
                                  screw-insert-outers
                            )
